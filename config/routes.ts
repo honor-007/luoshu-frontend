@@ -11,89 +11,99 @@
  * @doc https://umijs.org/docs/guides/routes
  */
 export default [
-    {
-        path: '/',
-        redirect: '/login',
-    },
-    {
-        name: '登录',
-        layout: false,
-        path: '/login',
-        component: './Login',
-    },
+  {
+    path: '/',
+    redirect: '/login',
+  },
+  {
+    name: '登录',
+    layout: false,
+    path: '/login',
+    component: './Login',
+  },
 
-    {
-        name: '管理页',
-        path: '/manage',
-        access: true,
+  {
+    name: '管理页',
+    path: '/manage',
+    access: true,
+    routes: [
+      {
+        name: '首页',
+        path: '/manage/home',
+        // access: 'home',
+        component: './Home',
+      },
+      {
+        name: 'CRUD 示例',
+        path: '/manage/table',
+        // access: 'table',
+        component: './Table',
+      },
+      {
+        name: '工作台',
+        path: '/manage/desk',
+        access: 'desk',
         routes: [
-            {
-                name: '首页',
-                path: '/manage/home',
-                // access: 'home',
-                component: './Home',
-            },
-            {
-                name: 'CRUD 示例',
-                path: '/manage/table',
-                // access: 'table',
-                component: './Table',
-            },
-            {
-                name: '工作台',
-                path: '/manage/desk',
-                access: 'desk',
-                routes: [
-                    {
-                        name: '通知公告',
-                        path: '/manage/desk/notice',
-                        access: 'notice',
-                        routes: [
-                            {path: '/manage/desk/notice', redirect: '/manage/desk/notice/list'},
-                            {path: '/manage/desk/notice/list', component: './Desk/Notice'},
-                            // {path: '/desk/notice/add', component: './Desk/Notice/components/NoticeAdd'},
-                            // {path: '/desk/notice/edit/:id', component: './Desk/Notice/NoticeEdit'},
-                            // {path: '/desk/notice/view/:id', component: './Desk/Notice/NoticeView'},
-                        ],
-                    },
-                ],
-            },
+          {
+            name: '通知公告',
+            path: '/manage/desk/notice',
+            access: 'notice',
+            routes: [
+              {
+                path: '/manage/desk/notice',
+                redirect: '/manage/desk/notice/list',
+              },
+              { path: '/manage/desk/notice/list', component: './Desk/Notice' },
+              // {path: '/desk/notice/add', component: './Desk/Notice/components/NoticeAdd'},
+              // {path: '/desk/notice/edit/:id', component: './Desk/Notice/NoticeEdit'},
+              // {path: '/desk/notice/view/:id', component: './Desk/Notice/NoticeView'},
+            ],
+          },
+        ],
+      },
 
-            {
-                name: '系统管理',
-                path: '/manage/system',
-                access: 'system',
-                routes: [
-                    {
-                        name: '用户管理',
-                        path: '/manage/system/user',
-                        access: 'user',
-                        routes: [
-                            {path: '/manage/system/user', redirect: '/manage/system/user/list'},
-                            {path: '/manage/system/user/list', component: './System/User'},
-                            // {path: '/desk/notice/add', component: './Desk/Notice/components/NoticeAdd'},
-                            // {path: '/desk/notice/edit/:id', component: './Desk/Notice/NoticeEdit'},
-                            // {path: '/desk/notice/view/:id', component: './Desk/Notice/NoticeView'},
-                        ],
-                    },
-                ],
-            },
-
-        ]
-    },
-    {
-        name: '服务页',
-        path: '/service',
-        access: true,
+      {
+        name: '系统管理',
+        path: '/manage/system',
+        access: 'system',
         routes: [
-            {
-                name: 'CRUD 示例',
-                path: '/service/table',
-                // access: 'table',
-                component: './Table',
-            },
-        ]
-    },
-
-
+          {
+            name: '用户管理',
+            path: '/manage/system/user',
+            access: 'user',
+            routes: [
+              {
+                path: '/manage/system/user',
+                redirect: '/manage/system/user/list',
+              },
+              { path: '/manage/system/user/list', component: './System/User' },
+              // {path: '/desk/notice/add', component: './Desk/Notice/components/NoticeAdd'},
+              // {path: '/desk/notice/edit/:id', component: './Desk/Notice/NoticeEdit'},
+              // {path: '/desk/notice/view/:id', component: './Desk/Notice/NoticeView'},
+            ],
+          },
+          {
+            name: '个人中心',
+            path: '/manage/system/personal-center',
+            access: 'user',
+            component: './System/PersonalCenter',
+            hideInMenu: true,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: '服务页',
+    path: '/service',
+    access: true,
+    routes: [
+      {
+        name: 'CRUD 示例',
+        path: '/service/table',
+        // access: 'table',
+        component: './Table',
+      },
+    ],
+  },
 ];
