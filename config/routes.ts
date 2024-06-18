@@ -21,7 +21,6 @@ export default [
     path: '/login',
     component: './Login',
   },
-
   {
     name: '管理页',
     path: '/manage',
