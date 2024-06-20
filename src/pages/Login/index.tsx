@@ -1,157 +1,210 @@
-import BaseLoginForm from '@/pages/Login/components/BaseLoginForm';
-import {
-  allMenuCodeArray,
-  userMenuCodeArray,
-} from '@/services/system/menu/api';
-import { setToken } from '@/utils/storage.utils';
-import {
-  AlipayCircleOutlined,
-  TaobaoCircleOutlined,
-  WeiboCircleOutlined,
-} from '@ant-design/icons';
-import { history, useModel } from '@umijs/max';
-import { Alert, message } from 'antd';
-import { createStyles } from 'antd-style';
-import React, { useState } from 'react';
-import { useIntl } from 'react-intl';
-import Settings from '../../../config/layoutSettings';
-
-const useStyles = createStyles(({ token }) => {
-  return {
-    action: {
-      marginLeft: '8px',
-      color: 'rgba(0, 0, 0, 0.2)',
-      fontSize: '24px',
-      verticalAlign: 'middle',
-      cursor: 'pointer',
-      transition: 'color 0.3s',
-      '&:hover': {
-        color: token.colorPrimaryActive,
-      },
-    },
-    lang: {
-      width: 42,
-      height: 42,
-      lineHeight: '42px',
-      position: 'fixed',
-      right: 16,
-      borderRadius: token.borderRadius,
-      ':hover': {
-        backgroundColor: token.colorBgTextHover,
-      },
-    },
-    container: {
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      overflow: 'auto',
-      backgroundImage:
-        "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
-      backgroundSize: '100% 100%',
-    },
-  };
-});
-
-const ActionIcons = () => {
-  const { styles } = useStyles();
-
-  return (
-    <>
-      <AlipayCircleOutlined
-        key="AlipayCircleOutlined"
-        className={styles.action}
-      />
-      <TaobaoCircleOutlined
-        key="TaobaoCircleOutlined"
-        className={styles.action}
-      />
-      <WeiboCircleOutlined
-        key="WeiboCircleOutlined"
-        className={styles.action}
-      />
-    </>
-  );
-};
-
-const LoginMessage: React.FC<{
-  content: string;
-}> = ({ content }) => {
-  return (
-    <Alert
-      style={{
-        marginBottom: 24,
-      }}
-      message={content}
-      type="error"
-      showIcon
-    />
-  );
-};
-
+import React, {useEffect, useState} from 'react';
+import $ from 'jquery'
+import './index.less'
+import {Button, Dropdown, DropdownProps, Image, MenuProps, message, Space} from "antd";
+import set1 from './asset/other-ico/set1.png'
+import swit from './asset/other-ico/switch.png'
+import login from './asset/other-ico/login.png'
+import resigter from './asset/other-ico/resigter.png'
+import star from './asset/other-ico/star.png'
+import star2 from './asset/other-ico/star2.png'
+// import Background_one from "@/pages/Login/components/background_one";
+import BackgroundParticle from "@/pages/Login/components/background_particle";
+import BackgroundSky from "@/pages/Login/components/background_sky"
+import BackgroundPlane from "@/pages/Login/components/background_plane";
 const Login: React.FC = () => {
-  const [grantType, setGrantType] = useState<string>('PASSWORD');
-  const [userLoginState, setUserLoginState] = useState<API.Result<string>>({});
-  const { initialState, setInitialState } = useModel('@@initialState');
 
-  const intl = useIntl();
-  const { styles } = useStyles();
+    useEffect(() => {
+        $('.login-in').click(function () {
+            $(this).addClass('big').siblings().removeClass('big')
+            $('.body').css('transform', 'rotateX(0)')
+        })
 
-  const handleSubmit = async (values: API.LoginParams) => {
-    // 登录
-    const body = { ...values, grantType, tenantId: '000000' };
-    const currentUser = await initialState?.fetchLogin?.(body);
-    if (currentUser) {
-      const menuCodeArrayResult = await userMenuCodeArray();
-      const allMenuCodeArrayResult = await allMenuCodeArray();
+        $('.login-up').click(function () {
+            $(this).addClass('big').siblings().removeClass('big')
+            $('.body').css('transform', 'rotateX(90deg)')
+        })
+        // 点击一下登录使其变大
+        $('.login-in').trigger('click')
+        // 定义弹窗
+        //tip是提示信息，type:'success'是成功信息，'danger'是失败信息,'info'是普通信息,'warning'是警告信息
+        function ShowTip(tip: any, type: any) {
+            let $tip = $('#tip');
+            if ($tip.length === 0) {
+                // console.log($tip.length);
+                // 设置样式，也可以定义在css文件中
+                // rgb(0,220,0,0.5)绿色
+                // transition:all 0.5s;
+                // transform:translateY(100px);transition:all 1s;
+                $tip = $('' +
+                    '<span id="tip" style="position:fixed;opacity:0.65;background-color:#e4ebf5;box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem  #FFFFFF;border-radius:10px;top:100px;left:50%;z-index:9999;height: 35px;padding: 0 20px;line-height: 35px;">' +
+                    '</span>');
+                $('body').append($tip);
+            }
+            if (type === 'insert') {
+                $tip.stop(true).text(tip).css(
+                    {
+                        'margin-left': -$tip.outerWidth()! / 2,
+                        'color': 'rgb(0,220,0,1)'
+                    }).fadeIn(200).delay(3000).fadeOut(800);
+            } else if (type === 'remove') {
+                $tip.stop(true).text(tip).css(
+                    {'margin-left': -$tip.outerWidth()! / 2, 'color': 'red'}).fadeIn(200).delay(3500).fadeOut(800);
+            }//设置显示位置和显示时间和消失时间
+        }
 
-      //存放token
-      setToken(currentUser.accessToken);
+        function InsertMsg(msg: any) {
+            ShowTip(msg, 'insert');
+        }
 
-      //存放userinfo
-      setInitialState((s: any) => ({
-        ...s,
-        currentUser: currentUser,
-        userMenuCodes: menuCodeArrayResult.data,
-        allMenuCodes: allMenuCodeArrayResult.data,
-      }));
+        function RemoveMsg(msg: any) {
+            ShowTip(msg, 'remove');
+        }
 
-      // const routerTree = await routers();
+        // 登录接口，点击登录按钮之后返回后台查询数据
+        $('#login-in-button').on('click', function (e) {
+            e.preventDefault()
+            $.post('/Servletlogin', $(this).parent().serialize(), function (res) {
+                const response = JSON.parse(res);
+                if (response.status === 0) {
+                    window.location.href = ('../../index.html')
+                } else {
+                    RemoveMsg(response.message)
+                }
+            })
+        })
+        // 注册接口，
+        $('#login-up-button').on('click', function (e) {
+            e.preventDefault()
+            $.post('/Servletregister', $(this).parent().serialize(), function (res) {
+                const response = JSON.parse(res);
+                if (response.status === 0) {
+                    InsertMsg('注册成功')
+                    $('.login-in').trigger('click')
+                } else {
+                    RemoveMsg(response.message)
+                    // alert(response.message)
+                }
+            })
+        })
 
-      // setToken()
-      const defaultLoginSuccessMessage = intl.formatMessage({
-        id: 'pages.login.success',
-        defaultMessage: '登录成功！',
-      });
-      message.success(defaultLoginSuccessMessage);
-      history.push('/manage/home');
-      return;
-    }
-    // 如果失败去设置用户错误信息
-    // setUserLoginState(msg);
-  };
+        $('.setting').mouseenter(function () {
+            $('.setting ul').stop(true).slideDown()
+        })
+        $('.setting').mouseleave(function () {
+            $('.setting ul').slideUp()
+        })
 
-  const { status, type: loginType } = userLoginState;
+        $('.skyup').click(function () {
+            $('iframe').attr('src', '../skyUp/index.html')
+        })
+        $('.lizi').click(function () {
+            $('iframe').attr('src', '../colorfulLiZi/index.html')
+        })
+        $('.plane').click(function () {
+            $('iframe').attr('src', '../plane/index.html')
+        })
+        $('.yun').click(function () {
+            $('iframe').attr('src', '../yun/index.html')
+        })
+        $('.star').click(function () {
+            $('iframe').attr('src', '../star/index.html')
+        })
+    }, [])
 
-  return (
-    <div className={styles.container}>
-      <title>
-        {intl.formatMessage({
-          id: 'menu.login',
-          defaultMessage: '登录页',
-        })}
-        - {Settings.title}
-      </title>
 
-      <div
-        style={{
-          flex: '1',
-          padding: '32px 0',
-        }}
-      >
-        <BaseLoginForm />
-      </div>
-    </div>
-  );
+    const items: MenuProps['items'] = [
+        {
+            key: 'sky',
+            label: '天空',
+        },
+        {
+            key: 'particle',
+            label: '粒子',
+        },
+        {
+            key: 'hexagonalShape',
+            label: '六角形',
+        },
+        {
+            key: 'plane',
+            label: '小飞机',
+        },
+        {
+            key: 'blueStar',
+            label: '蓝星',
+        },
+    ];
+    const onClick: MenuProps['onClick'] = ({key}) => {
+        message.info(`Click on item ${key}`);
+    };
+
+    return (
+        <div>
+            <div className='setting'>
+                <Dropdown menu={{items, onClick}} placement="bottom">
+                    <img src={swit} alt={'切换背景'}></img>
+                </Dropdown>
+            </div>
+            <div className="main">
+                <div className="head">
+                    <div className="login-in">
+                        <img src={login} alt={'登录'}/>
+                        登录
+                    </div>
+                    <div className="login-up">
+                        <img src={resigter} alt={'注册'}/>
+                        注册
+                    </div>
+                </div>
+                <div className="body">
+                    <div className="front">
+                        <div className="left">
+                            <img src={star} alt={'1'}></img>
+                            <div className="welcome">
+                                Welcome!
+                            </div>
+                            <p>希君生羽翼,一化北溟鱼。</p>
+
+                        </div>
+                        <div className="right">
+                            <form>
+                                <h2>登陆账号</h2>
+                                <input name="username" type="text" placeholder="账号"></input>
+                                <input name="password" type="password" placeholder="密码"></input>
+                                <button type="submit" id="login-in-button">登录</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div className="back">
+                        <div className="left">
+                            <img src={star2} alt={'1'}></img>
+                            <div className="welcome">
+                                Welcome!
+                            </div>
+                            <p>不念过往,纵情向前!</p>
+                        </div>
+                        <div className="right">
+                            <div className="exist">该用户名已注册，请更换用户名~</div>
+                            <form>
+                                <h2>注册账号</h2>
+                                <input className="username" name="username" type="text" placeholder="账号"></input>
+                                <input name="password" type="password" placeholder="密码"></input>
+                                <button type="submit" id="login-up-button">注册</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="theme">
+                {/*<BackgroundParticle/>*/}
+                <BackgroundSky/>
+                {/*<BackgroundPlane/>*/}
+            </div>
+
+        </div>
+    );
 };
 
 export default Login;

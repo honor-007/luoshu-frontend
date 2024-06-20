@@ -13,13 +13,19 @@
 export default [
   {
     path: '/',
-    redirect: '/login',
+    redirect: '/demo',
   },
   {
     name: '登录',
     layout: false,
     path: '/login',
     component: './Login',
+  },
+  {
+    name: '登录2',
+    layout: false,
+    path: '/demo',
+    component: './Demo',
   },
   {
     name: '管理页',
