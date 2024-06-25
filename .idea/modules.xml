@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/react-base.iml" filepath="$PROJECT_DIR$/.idea/react-base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/luoshu-frontend.iml" filepath="$PROJECT_DIR$/.idea/luoshu-frontend.iml" />
     </modules>
   </component>
 </project>
