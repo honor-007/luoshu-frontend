@@ -1,18 +1,65 @@
 import React, {useEffect, useState} from 'react';
 import $ from 'jquery'
 import './index.less'
-import {Button, Dropdown, DropdownProps, Image, MenuProps, message, Space} from "antd";
-import set1 from './asset/other-ico/set1.png'
+import {Dropdown, MenuProps, message} from "antd";
 import swit from './asset/other-ico/switch.png'
 import login from './asset/other-ico/login.png'
 import resigter from './asset/other-ico/resigter.png'
 import star from './asset/other-ico/star.png'
 import star2 from './asset/other-ico/star2.png'
-// import Background_one from "@/pages/Login/components/background_one";
 import BackgroundParticle from "@/pages/Login/components/background_particle";
 import BackgroundSky from "@/pages/Login/components/background_sky"
-import BackgroundPlane from "@/pages/Login/components/background_plane";
+import BackgroundHexagonalshape from "@/pages/Login/components/background_hexagonalShape"
+import BackgroundBuleStar from "@/pages/Login/components/background_bulestar"
+import {userMenuCodeArray, routers, allMenuCodeArray} from "@/services/system/menu/api";
+import {useIntl} from "@@/exports";
+import {history, useModel} from '@umijs/max';
+import {setToken} from "@/utils/storage.utils";
+
 const Login: React.FC = () => {
+
+    const [grantType, setGrantType] = useState<string>('PASSWORD');
+    const [userLoginState, setUserLoginState] = useState<API.Result<string>>({});
+    const {initialState, setInitialState} = useModel('@@initialState');
+    const intl = useIntl();
+
+    const handleSubmit = async (values: API.LoginParams) => {
+        console.log("---values---",values)
+        // 登录
+        const body = {...values, grantType, 'tenantId': '000000'}
+        const currentUser = await initialState?.fetchLogin?.(body);
+        if (currentUser) {
+            const menuCodeArrayResult = await userMenuCodeArray();
+            const allMenuCodeArrayResult = await allMenuCodeArray();
+
+            //存放token
+            setToken(currentUser.accessToken);
+
+            //存放userinfo
+            setInitialState((s: any) => ({
+                ...s,
+                currentUser: currentUser,
+                userMenuCodes: menuCodeArrayResult.data,
+                allMenuCodes: allMenuCodeArrayResult.data,
+            }))
+
+            // const routerTree = await routers();
+
+            // setToken()
+            const defaultLoginSuccessMessage = intl.formatMessage({
+                id: 'pages.login.success',
+                defaultMessage: '登录成功！',
+            });
+            message.success(defaultLoginSuccessMessage);
+            history.push('/manage/home');
+            return;
+        }
+        // 如果失败去设置用户错误信息
+        // setUserLoginState(msg);
+    };
+
+
+    const [backgroundTheme, setBackgroundTheme] = useState<any>('sky');
 
     useEffect(() => {
         $('.login-in').click(function () {
@@ -62,17 +109,17 @@ const Login: React.FC = () => {
         }
 
         // 登录接口，点击登录按钮之后返回后台查询数据
-        $('#login-in-button').on('click', function (e) {
-            e.preventDefault()
-            $.post('/Servletlogin', $(this).parent().serialize(), function (res) {
-                const response = JSON.parse(res);
-                if (response.status === 0) {
-                    window.location.href = ('../../index.html')
-                } else {
-                    RemoveMsg(response.message)
-                }
-            })
-        })
+        // $('#login-in-button').on('click', function (e) {
+        //     e.preventDefault()
+        //     $.post('/Servletlogin', $(this).parent().serialize(), function (res) {
+        //         const response = JSON.parse(res);
+        //         if (response.status === 0) {
+        //             window.location.href = ('../../index.html')
+        //         } else {
+        //             RemoveMsg(response.message)
+        //         }
+        //     })
+        // })
         // 注册接口，
         $('#login-up-button').on('click', function (e) {
             e.preventDefault()
@@ -126,10 +173,10 @@ const Login: React.FC = () => {
             key: 'hexagonalShape',
             label: '六角形',
         },
-        {
-            key: 'plane',
-            label: '小飞机',
-        },
+        // {
+        //     key: 'plane',
+        //     label: '小飞机',
+        // },
         {
             key: 'blueStar',
             label: '蓝星',
@@ -137,6 +184,7 @@ const Login: React.FC = () => {
     ];
     const onClick: MenuProps['onClick'] = ({key}) => {
         message.info(`Click on item ${key}`);
+        setBackgroundTheme(key);
     };
 
     return (
@@ -170,9 +218,13 @@ const Login: React.FC = () => {
                         <div className="right">
                             <form>
                                 <h2>登陆账号</h2>
-                                <input name="username" type="text" placeholder="账号"></input>
-                                <input name="password" type="password" placeholder="密码"></input>
-                                <button type="submit" id="login-in-button">登录</button>
+                                <input className={'input'} name="username" type="text" placeholder="账号"></input>
+                                <input className='input' name="password" type="password" placeholder="密码"></input>
+                                <button type="submit" id="login-in-button"
+                                        onClick={async (values) => {
+                                            await handleSubmit(values as API.LoginParams);
+                                        }}>登录
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -198,9 +250,10 @@ const Login: React.FC = () => {
             </div>
 
             <div className="theme">
-                {/*<BackgroundParticle/>*/}
-                <BackgroundSky/>
-                {/*<BackgroundPlane/>*/}
+                {backgroundTheme === 'particle' && <BackgroundParticle/>}
+                {backgroundTheme === 'sky' && <BackgroundSky/>}
+                {backgroundTheme === 'hexagonalShape' && <BackgroundHexagonalshape/>}
+                {backgroundTheme === 'blueStar' && <BackgroundBuleStar/>}
             </div>
 
         </div>
